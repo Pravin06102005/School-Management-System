@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Gym — Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* Base Styles */
+        body { font-family: 'Montserrat', sans-serif; }
+        
+        /* Fixed Navbar Style */
+        .navbar.fixed-top { 
+            position: fixed; 
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+        }
+        /* Body padding to prevent content from hiding under the fixed navbar */
+        body {
+            padding-top: 70px; 
+        }
+
+        .hero { 
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('image/dekstop.jpg') no-repeat center center/cover;
+            color: #fff; 
+            padding: 8rem 0;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+        }
+        .hero h1 { font-weight: 800; font-size: 4.5rem; }
+        .hero .lead { font-size: 1.5rem; font-weight: 400; }
+        
+        /* General Card and Feature Box Styling */
+        .feature-box { text-align: center; padding: 2rem; background-color: #f1f4f8; border-radius: 12px; height: 100%; box-shadow: 0 4px 8px rgba(0,0,0,0.05); } 
+        .navbar-brand { font-weight: 800; color: #0d6efd !important; font-size: 1.5rem; }
+
+        /* Custom Section: Value Proposition */
+        .value-prop { border-left: 5px solid #0d6efd; padding: 1rem 1.5rem; background-color: #e9f0f9; border-radius: 0 10px 10px 0; margin-bottom: 1rem; }
+        .value-prop h4 { color: #0d6efd; font-weight: 700; }
+        .value-image { border-radius: 12px; object-fit: cover; height: 350px; width: 100%; }
+
+        /* New Section: Testimonials/Success Stories */
+        .testimonial-card { 
+            padding: 2rem; 
+            background: #fff; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .testimonial-quote {
+            font-style: italic;
+            color: #343a40;
+            margin-bottom: 1.5rem;
+        }
+        .testimonial-author {
+            font-weight: 700;
+            color: #0d6efd;
+            margin-top: auto; /* Push to bottom */
+        }
+
+        /* New Section: Join CTA Block */
+        .join-cta-block {
+            background-color: #0d6efd;
+            color: white;
+            padding: 4rem 2rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .join-cta-block h2 {
+            font-weight: 800;
+            color: #ffc107; /* Warning color */
+        }
+        
+
+        /* Footer enhancement */
+        .footer-link { color: #adb5bd; text-decoration: none; display: block; margin-bottom: 0.5rem; transition: color 0.2s; }
+        .footer-link:hover { color: #fff; text-decoration: underline; }
+
+
+        /* --- @Media for Small Screens (Mobile) --- */
+        @media (max-width: 768px) {
+            body { padding-top: 50px; } 
+            .hero { padding: 6rem 0; }
+            .hero h1 { font-size: 3rem; }
+            .row > [class*='col-'] { margin-bottom: 1.5rem; } 
+            .value-image { height: 250px; }
+            .join-cta-block { padding: 3rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-lg">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Fit club</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link **active** fw-bold" aria-current="page" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="trainers.html">Trainers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="equipments.html">Equipments</a></li>
+                    <li class="nav-item"><a class="nav-link" href="memberships.html">Memberships</a></li>
+                    <li class="nav-item"><a class="nav-link" href="bmi.html">BMI Calc</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero text-center">
+        <div class="container">
+            <h1 class="animate__animated animate__fadeInDown">**Forge Your Best Self**</h1>
+            <p class="lead animate__animated animate__fadeInUp">Elite facilities, certified expertise, and a motivating community. Your transformation starts now.</p>
+            <a href="contact.html" class="btn btn-warning btn-lg mt-4 px-5 shadow-lg animate__animated animate__pulse animate__infinite">**Claim Your Free Trial**</a>
+        </div>
+    </section>
+
+    <main class="container my-5">
+        
+        <h2 class="text-center mb-4 pt-3 fw-bold">Why Choose Us?</h2>
+        <p class="text-center mb-5 text-muted lead">We go beyond the weights to offer a complete wellness experience.</p>
+
+        <div class="row text-center mb-5">
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <h3>✅ Proven Results</h3>
+                    <p>Our tailored programs ensure you hit your targets effectively and safely.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <h3>🕒 24/7 Access</h3>
+                    <p>Work out on your schedule, anytime, day or night, with secure access.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <h3>🍽️ Nutrition Guidance</h3>
+                    <p>Get personalized dietary advice to complement your training regimen.</p>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row my-5 align-items-center">
+            <div class="col-lg-6 mb-4">
+                <h3 class="fw-bold mb-4">Our Commitment to You</h3>
+                <div class="value-prop">
+                    <h4>Innovation in Fitness</h4>
+                    <p class="mb-0">We constantly update our equipment and training methods based on the latest science.</p>
+                </div>
+                <div class="value-prop">
+                    <h4>Inclusivity & Respect</h4>
+                    <p class="mb-0">A judgment-free zone where everyone is encouraged and celebrated, regardless of fitness level.</p>
+                </div>
+                <div class="value-prop">
+                    <h4>Cleanliness & Safety</h4>
+                    <p class="mb-0">Industry-leading hygiene protocols and a safe environment for all members.</p>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <img src="image/dekstop.jpg" alt="Modern gym interior with equipment" class="value-image shadow-lg">
+            </div>
+        </div>
+
+        <hr>
+        
+        <h2 class="text-center mb-5 mt-5 fw-bold">Hear From Our Members 🗣️</h2>
+        <div class="row gy-4 mb-5">
+            <div class="col-md-4">
+                <div class="testimonial-card">
+                    <p class="testimonial-quote">"I lost 15 pounds in 3 months! The trainers here genuinely care and the atmosphere is incredibly motivating."</p>
+                    <p class="testimonial-author">— Alex R., Weight Loss Success</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial-card">
+                    <p class="testimonial-quote">"The 24/7 access is a game-changer for my busy schedule. Top-tier equipment that is always clean."</p>
+                    <p class="testimonial-author">— Jamie L., Elite Member</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial-card">
+                    <p class="testimonial-quote">"Finally found a gym where I feel comfortable. The community classes are fantastic and the nutrition advice was essential."</p>
+                    <p class="testimonial-author">— Chris P., Fitness Enthusiast</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row my-5">
+            <div class="col-12">
+                <div class="join-cta-block shadow-lg">
+                    <h2>Ready to Make a Change?</h2>
+                    <p class="lead mt-3 mb-4">Don't wait for Monday. The best day to start is today.</p>
+                    <a href="memberships.html" class="btn btn-lg btn-warning fw-bold px-5">Explore Membership Options</a>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-primary mb-3">Quick Links</h5>
+                    <a href="trainers.html" class="footer-link">Meet Our Team</a>
+                    <a href="equipments.html" class="footer-link">Our Facilities</a>
+                    <a href="memberships.html" class="footer-link">Pricing Plans</a>
+                    <a href="contact.html" class="footer-link">FAQs</a>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-primary mb-3">Operating Hours</h5>
+                    <p class="mb-1"><i class="far fa-clock me-2"></i> Mon - Fri: 5:00 AM - 11:00 PM</p>
+                    <p class="mb-1"><i class="far fa-clock me-2"></i> Sat - Sun: 7:00 AM - 9:00 PM</p>
+                    <p class="small text-muted mt-2">*(24/7 Access for Elite Members)*</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-primary mb-3">Contact Us</h5>
+                    <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i> 123 Fitness Ave, Wellness City</p>
+                    <p class="mb-1"><i class="fas fa-phone me-2"></i> (555) 123-4567</p>
+                    <p class="mb-1"><i class="fas fa-envelope me-2"></i> info@fitnesscenter.com</p>
+                </div>
+            </div>
+            <hr class="my-4 border-secondary">
+            <div class="text-center">
+                <p class="mb-0">© 2025 Fitness Center — **All rights reserved**. | Designed for **Peak Performance**</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // --- JavaScript Logic ---
+        // Since we removed the dynamic rendering sections, 
+        // the loadHighlights function is no longer needed. 
+        // We only need the Bootstrap bundle script for functionality.
+        
+        // This script block remains only for clarity, but is effectively empty for rendering dynamic content.
+    </script>
+</body>
+</html>

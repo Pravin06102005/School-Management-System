@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Gym — About Us</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* Base Styles */
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            padding-top: 70px; /* Space for the fixed navbar */
+        }
+        
+        /* Fixed Navbar Style */
+        .navbar.fixed-top { 
+            position: fixed; 
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+        }
+        .navbar-brand { font-weight: 800; color: #0d6efd !important; font-size: 1.5rem; }
+
+        /* Content Styling */
+        .about-section {
+            padding: 2rem;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        .mission-box {
+            border-left: 5px solid #0d6efd;
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .value-icon {
+            font-size: 2rem;
+            color: #ffc107; /* Warning color for icons */
+            margin-bottom: 1rem;
+        }
+
+        /* Header Styling */
+        .page-header {
+            background-color: #e9f0f9;
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+            border-bottom: 3px solid #0d6efd;
+            text-align: center;
+        }
+
+        /* Footer enhancement styles */
+        .footer-link { color: #adb5bd; text-decoration: none; display: block; margin-bottom: 0.5rem; transition: color 0.2s; }
+        .footer-link:hover { color: #fff; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-lg">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Fit club</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="trainers.html">Trainers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="equipments.html">Equipments</a></li>
+                    <li class="nav-item"><a class="nav-link" href="memberships.html">Memberships</a></li>
+                    <li class="nav-item"><a class="nav-link" href="bmi.html">BMI Calc</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-bold" aria-current="page" href="about.html">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <div class="container">
+            <h1 class="fw-bold">Defining Fitness Excellence Since 2010</h1>
+            <p class="lead">More than just a gym, we're a community dedicated to helping you succeed.</p>
+        </div>
+    </header>
+
+    <main class="container my-5">
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="mission-box">
+                    <h2 class="text-primary fw-bold">Our Mission Statement 💡</h2>
+                    <p class="lead">To inspire and empower every member to achieve their highest potential through world-class training, state-of-the-art facilities, and unparalleled support.</p>
+                </div>
+                
+                <h3 class="mt-4">Our History</h3>
+                <p>Founded in **2010**, Fitness Center started as a small local studio with a big vision: to create a fitness environment that was welcoming, professional, and results-driven. Over the last decade, we've grown into a leading fitness facility in Wellness City, constantly updating our equipment and expanding our programs to meet the evolving needs of our members.</p>
+                
+                <h3 class="mt-4">What Makes Us Different?</h3>
+                <ul>
+                    <li>**Certified Expertise:** Our trainers hold the highest industry certifications and are passionate about personalized guidance.</li>
+                    <li>**Community Focus:** We host regular member events and challenges to foster a motivating, inclusive atmosphere.</li>
+                    <li>**24/7 Commitment:** We offer flexible access and support, ensuring fitness fits into your life, not the other way around.</li>
+                </ul>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="about-section shadow-sm">
+                    <h3 class="fw-bold mb-4">Key Information</h3>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-users value-icon me-3"></i>
+                        <div>
+                            <h5 class="mb-0">Members Strong</h5>
+                            <p class="mb-0 text-muted">Over 5,000 active members and growing.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-map-marker-alt value-icon me-3"></i>
+                        <div>
+                            <h5 class="mb-0">Location</h5>
+                            <p class="mb-0 text-muted">123 Fitness Ave, Wellness City. (Near Central Park)</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-dumbbell value-icon me-3"></i>
+                        <div>
+                            <h5 class="mb-0">Facilities</h5>
+                            <p class="mb-0 text-muted">15,000 sq ft dedicated to fitness and wellness.</p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h4 class="fw-bold mt-4">Ready to Join?</h4>
+                    <a href="memberships.html" class="btn btn-warning w-100 btn-lg">View Plans Now</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-primary mb-3">Quick Links</h5>
+                    <a href="trainers.html" class="footer-link">Meet Our Team</a>
+                    <a href="equipments.html" class="footer-link">Our Facilities</a>
+                    <a href="memberships.html" class="footer-link">Pricing Plans</a>
+                    <a href="contact.html" class="footer-link">FAQs</a>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-primary mb-3">Operating Hours</h5>
+                    <p class="mb-1"><i class="far fa-clock me-2"></i> Mon - Fri: 5:00 AM - 11:00 PM</p>
+                    <p class="mb-1"><i class="far fa-clock me-2"></i> Sat - Sun: 7:00 AM - 9:00 PM</p>
+                    <p class="small text-muted mt-2">*(24/7 Access for Elite Members)*</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-primary mb-3">Contact Info</h5>
+                    <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i> 123 Fitness Ave, Wellness City</p>
+                    <p class="mb-1"><i class="fas fa-phone me-2"></i> (555) 123-4567</p>
+                    <p class="mb-1"><i class="fas fa-envelope me-2"></i> info@fitnesscenter.com</p>
+                </div>
+            </div>
+            <hr class="my-4 border-secondary">
+            <div class="text-center">
+                <p class="mb-0">© 2025 Fitness Center — **All rights reserved**. | Designed for **Peak Performance**</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
