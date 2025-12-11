@@ -1,29 +1,24 @@
 # ============================
-# STEP 1 — BUILD JAR
+# 1️⃣ BUILD STAGE
 # ============================
 FROM maven:3.9.6-eclipse-temurin-21 AS build
-
 WORKDIR /app
 
-# Copy backend project
+# Copy project files from School-Management folder
 COPY School-Management/pom.xml .
 COPY School-Management/src ./src
-COPY School-Management/mvnw .
-COPY School-Management/mvnw.cmd .
-COPY School-Management/.mvn ./.mvn
 
-RUN chmod +x mvnw
-RUN ./mvnw clean package -DskipTests
+# Build jar
+RUN mvn -q -e -DskipTests package
 
 # ============================
-# STEP 2 — RUN JAR
+# 2️⃣ RUN STAGE
 # ============================
 FROM eclipse-temurin:21-jdk
-
 WORKDIR /app
 
+# Copy built jar from previous stage
 COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
-
 ENTRYPOINT ["java", "-jar", "app.jar"]
