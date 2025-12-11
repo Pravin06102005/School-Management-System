@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Dashboard - School Management</title>
+    
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    
+    <link rel="stylesheet" 
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary-color: #0d6efd;
+            --bg-color: #f4f7fa;
+            --dark-color: #2c3e50;
+            --danger-color: #dc3545;
+        }
+        
+        body {
+            background: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            /* Desktop Default: Content shifted right */
+            padding-left: var(--sidebar-width); 
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--dark-color);
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding-top: 20px;
+            color: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 1050; 
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar .logo-title {
+            color: white;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            padding: 0 25px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: #bdc3c7;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1rem;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 21px; 
+        }
+        
+        .sidebar .logout-link {
+            color: var(--danger-color);
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+        }
+        
+        .sidebar .logout-link:hover {
+            background: rgba(220, 53, 69, 0.2);
+            color: white;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        /* Main Content Styling (Desktop Default) */
+        .content {
+            margin-left: 0;
+            padding: 30px;
+            transition: margin-left 0.3s;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            background: white;
+            padding: 10px 20px; /* Reduced padding for mobile space */
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .navbar #welcomeHeader {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem !important; /* Smaller on all screens */
+            margin-left: 10px; /* Space after toggle on mobile */
+        }
+
+        /* Card Styling */
+        .card-box {
+            padding: 30px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            text-align: left;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 5px solid;
+            min-height: 120px; /* Consistent height */
+        }
+        
+        .card-box h1 {
+            font-size: 2rem; /* Slightly smaller for better fit */
+        }
+        
+        /* Color-coded Cards */
+        #stdCard { border-left-color: #0d6efd; }
+        #divCard { border-left-color: #198754; }
+        #stuCard { border-left-color: #ffc107; }
+        #staffCard { border-left-color: #dc3545; }
+
+
+        .card-icon {
+            font-size: 2rem;
+            float: right;
+            opacity: 0.6;
+            margin-top: 5px;
+        }
+        
+        .table-standard-dist th {
+            background-color: #f8f9fa;
+        }
+        
+        .activity-item {
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+            font-size: 0.9rem; /* Smaller text for activity feed */
+        }
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* ---------------- MOBILE RESPONSIVENESS ---------------- */
+
+        @media (max-width: 991px) {
+            body {
+                padding-left: 0; /* Remove desktop padding */
+            }
+            .sidebar {
+                /* Hide sidebar off-screen to the left */
+                transform: translateX(-260px); 
+            }
+            /* Show the toggle button on small screens */
+            #sidebarToggle {
+                display: block !important;
+            }
+            .content {
+                padding: 15px; /* Reduced padding for more space */
+            }
+            .card-box h1 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        /* Class added by JS to show sidebar on mobile */
+        .sidebar-toggled .sidebar {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+
+<body id="page-body">
+
+<div class="sidebar">
+    <div class="logo-title text-center">
+        <i class="bi bi-gear-fill me-2"></i> Admin Panel
+    </div>
+
+    <a href="index.html" class="active">
+        <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+    <a href="standards.html">
+        <i class="bi bi-journal-check"></i> Standards
+    </a>
+    <a href="divisions.html">
+        <i class="bi bi-collection"></i> Divisions
+    </a>
+    <a href="students.html">
+        <i class="bi bi-person-bounding-box"></i> Students
+    </a>
+    <a href="staff.html">
+        <i class="bi bi-people"></i> Staff
+    </a>
+    <a href="profile.html"><i class="bi bi-person-circle"></i> Profile & Settings</a>
+    
+    <a href="#" onclick="logout()" class="logout-link">
+        <i class="bi bi-box-arrow-right"></i> Logout
+    </a>
+</div>
+
+
+<div class="content">
+
+    <div class="navbar d-flex justify-content-between align-items-center">
+        <button class="btn btn-outline-dark d-lg-none" id="sidebarToggle">
+            <i class="bi bi-list fs-5"></i>
+        </button>
+
+        <h1 id="welcomeHeader" class="h4 mb-0">Loading School Name...</h1>
+        <div></div> 
+    </div>
+
+    <h3 class="mt-4 mb-4">📊 Dashboard Overview</h3>
+
+    <div class="row g-4">
+
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card-box" id="stdCard">
+                <i class="bi bi-journal-check card-icon text-primary"></i>
+                <h1 id="stdCount">0</h1>
+                <h3>Standards</h3>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card-box" id="divCard">
+                <i class="bi bi-collection card-icon text-success"></i>
+                <h1 id="divCount">0</h1>
+                <h3>Divisions</h3>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card-box" id="stuCard">
+                <i class="bi bi-person-bounding-box card-icon text-warning"></i>
+                <h1 id="stuCount">0</h1>
+                <h3>Students</h3>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card-box" id="staffCard">
+                <i class="bi bi-people card-icon text-danger"></i>
+                <h1 id="staffCount">0</h1>
+                <h3>Staff</h3>
+            </div>
+        </div>
+
+    </div>
+    
+    <div class="mt-5">
+        <div class="row g-4">
+            
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 p-4">
+                    <h4 class="mb-3">📚 Student Distribution by Standard</h4>
+                    <p class="text-muted">Breakdown of active students enrolled in each standard.</p>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-sm table-standard-dist">
+                            <thead>
+                                <tr>
+                                    <th style="width: 70%">Standard Name</th>
+                                    <th style="width: 30%">Total Students</th>
+                                </tr>
+                            </thead>
+                            <tbody id="standardDistributionBody">
+                                <tr><td colspan="2" class="text-center text-muted">Loading distribution...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                
+                <div class="card shadow-sm border-0 p-4">
+                    <h4 class="mb-3"><i class="bi bi-activity me-2"></i>Recent Activity</h4>
+                    <div id="activityFeed">
+                        <div class="text-center text-muted">Loading activity...</div>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+        <p id="distributionError" class="text-danger mt-2"></p>
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const BASE_URL = "http://localhost:8080/api";
+    const token = localStorage.getItem("token");
+    const schoolName = localStorage.getItem("schoolName"); 
+    const headers = { "Authorization": "Bearer " + token };
+
+    if (!token) window.location = "login.html";
+
+    const distributionBody = document.getElementById("standardDistributionBody");
+    const distributionError = document.getElementById("distributionError");
+    const activityFeed = document.getElementById("activityFeed");
+    const pageBody = document.getElementById("page-body"); // Get the body element for toggling
+
+    // --- Responsive Toggle Logic ---
+    document.getElementById("sidebarToggle").addEventListener("click", function (e) {
+        e.preventDefault();
+        pageBody.classList.toggle("sidebar-toggled");
+    });
+    
+    // Auto-hide on desktop resize if it was toggled on mobile
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 992) {
+            pageBody.classList.remove("sidebar-toggled");
+        }
+    });
+    // -----------------------------------
+
+
+    function setWelcomeMessage() {
+        const header = document.getElementById("welcomeHeader");
+        if (schoolName) {
+            header.textContent = `${schoolName} Dashboard 👋`;
+        } else {
+            header.textContent = "Welcome, School Admin 👋";
+        }
+    }
+    
+    /**
+     * Helper function to safely fetch data and handle non-OK responses, providing better console logging.
+     */
+    async function safeFetch(url) {
+        const response = await fetch(url, { headers });
+        if (!response.ok) {
+            console.error(`API Fetch Failed: Status ${response.status} for URL: ${url}`);
+            try {
+                const errorBody = await response.json();
+                throw new Error(errorBody.message || `HTTP Error ${response.status}`);
+            } catch (e) {
+                throw new Error(`HTTP Error ${response.status}`);
+            }
+        }
+        return response.json();
+    }
+
+    /**
+     * Fetches counts for all main entities.
+     */
+    async function loadCounts() {
+        distributionError.textContent = '';
+        try {
+            const [std, div, stu, staff] = await Promise.all([
+                safeFetch(`${BASE_URL}/standards`),
+                safeFetch(`${BASE_URL}/divisions`),
+                safeFetch(`${BASE_URL}/students`),
+                safeFetch(`${BASE_URL}/staff`)
+            ]);
+
+            // Update main overview cards
+            document.getElementById("stdCount").textContent = Array.isArray(std) ? std.length : 0;
+            document.getElementById("divCount").textContent = Array.isArray(div) ? div.length : 0;
+            document.getElementById("stuCount").textContent = Array.isArray(stu) ? stu.length : 0;
+            document.getElementById("staffCount").textContent = Array.isArray(staff) ? staff.length : 0;
+
+        } catch (err) {
+            console.error("Error loading counts:", err);
+            distributionError.textContent = `Error loading main counts: ${err.message}`;
+        }
+    }
+    
+    /**
+     * Fetches students and standards to calculate distribution.
+     */
+    async function loadStandardDistribution() {
+        distributionBody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">Loading distribution...</td></tr>';
+        distributionError.textContent = '';
+        
+        try {
+            const [standards, students] = await Promise.all([
+                safeFetch(`${BASE_URL}/standards`),
+                safeFetch(`${BASE_URL}/students`)
+            ]);
+
+            if (!Array.isArray(standards) || !Array.isArray(students)) {
+                throw new Error("API returned non-array data. Check server JSON format.");
+            }
+
+            const distributionMap = new Map();
+            standards.forEach(std => distributionMap.set(std.id, 0));
+
+            students.forEach(student => {
+                if (student.standardId && distributionMap.has(student.standardId)) {
+                    distributionMap.set(student.standardId, distributionMap.get(student.standardId) + 1);
+                }
+            });
+
+            standards.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+            distributionBody.innerHTML = '';
+
+            if (standards.length === 0) {
+                distributionBody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">No standards defined.</td></tr>';
+                return;
+            }
+
+            standards.forEach(std => {
+                const count = distributionMap.get(std.id);
+                distributionBody.innerHTML += `
+                    <tr>
+                        <td><i class="bi bi-tag-fill me-2 text-primary"></i> ${std.name}</td>
+                        <td><span class="badge rounded-pill bg-primary">${count}</span></td>
+                    </tr>
+                `;
+            });
+
+        } catch (err) {
+            console.error("Error loading distribution:", err);
+            distributionBody.innerHTML = '<tr><td colspan="2" class="text-center text-danger">Failed to load distribution data.</td></tr>';
+            distributionError.textContent = `Error loading student breakdown: ${err.message}`;
+        }
+    }
+    
+    /**
+     * Attempts to fetch actual recent activity logs from the backend.
+     */
+    async function loadRecentActivity() {
+        activityFeed.innerHTML = '<div class="text-center text-muted">Loading activity...</div>';
+        const LOGS_URL = `${BASE_URL}/logs/recent`;
+        
+        try {
+            const response = await fetch(LOGS_URL, { headers });
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    throw new Error("Log API endpoint not found. Using mock data.");
+                }
+                throw new Error(`Failed to fetch logs (Status: ${response.status})`);
+            }
+            
+            const logs = await response.json();
+
+            if (!Array.isArray(logs) || logs.length === 0) {
+                 activityFeed.innerHTML = '<div class="text-center text-muted">No recent activity recorded.</div>';
+                 return;
+            }
+            
+            activityFeed.innerHTML = ''; // Clear loading message
+
+            logs.slice(0, 5).forEach(log => { // Display top 5
+                // NOTE: This internal logic must match your actual backend log object structure
+                const color = log.action.includes('Added') ? 'text-success' : log.action.includes('Deleted') ? 'text-danger' : 'text-primary';
+                const icon = log.entityType === 'Student' ? 'bi-person-badge' : log.entityType === 'Staff' ? 'bi-people' : 'bi-gear';
+                const timestamp = new Date(log.timestamp).toLocaleTimeString();
+
+                activityFeed.innerHTML += `
+                    <div class="activity-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi ${icon} me-2 ${color}"></i>
+                            <strong>${log.action}:</strong> ${log.entityName} (${log.entityType})
+                        </div>
+                        <small class="text-muted">${timestamp}</small>
+                    </div>
+                `;
+            });
+
+        } catch (err) {
+            console.warn(`Log fetch failed: ${err.message}. Displaying mock data.`);
+            displayMockActivity();
+        }
+    }
+    
+    /** Mock data function for demonstration */
+    function displayMockActivity() {
+        const mockActivities = [
+            { type: 'Student', action: 'Added', name: 'New Student A', icon: 'bi-person-plus-fill', color: 'text-success' },
+            { type: 'Standard', action: 'Updated', name: '10th Grade', icon: 'bi-pencil-square', color: 'text-warning' },
+            { type: 'Division', action: 'Deleted', name: 'Division B', icon: 'bi-trash-fill', color: 'text-danger' },
+            { type: 'Staff', action: 'Added', name: 'Ms. Clark', icon: 'bi-person-badge-fill', color: 'text-primary' },
+        ];
+        activityFeed.innerHTML = '';
+        mockActivities.forEach(activity => {
+            activityFeed.innerHTML += `
+                <div class="activity-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi ${activity.icon} me-2 ${activity.color}"></i>
+                        <strong>${activity.action} ${activity.type}:</strong> ${activity.name}
+                    </div>
+                    <small class="text-muted">Mock Time</small>
+                </div>
+            `;
+        });
+    }
+
+
+    /**
+     * Clears the authentication token and redirects to the login page.
+     */
+    function logout() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("schoolName");
+        window.location = "login.html";
+    }
+    
+    // --- Page Load ---
+    document.addEventListener('DOMContentLoaded', () => {
+        setWelcomeMessage();
+        loadCounts();
+        loadStandardDistribution(); 
+        loadRecentActivity(); 
+        
+        // Expose function globally for the sidebar link
+        window.logout = logout; 
+    });
+</script>
+
+</body>
+</html>

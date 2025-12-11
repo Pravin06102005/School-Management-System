@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Register</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    
+    <style>
+        /* Responsive Styling */
+        .vh-100 {
+            min-height: 100vh;
+        }
+        
+        .card {
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        @media (max-width: 400px) {
+            .card {
+                padding: 15px !important;
+                width: 95%;
+            }
+        }
+        /* Style for invalid inputs */
+        input:invalid:not(:placeholder-shown), select:invalid:not(:placeholder-shown) {
+            border-color: #dc3545; /* Bootstrap danger color */
+        }
+    </style>
+</head>
+
+<body class="bg-light d-flex justify-content-center align-items-center vh-100">
+
+<div class="card p-4 shadow">
+    <h3 class="text-center mb-3 text-primary">Admin Registration</h3>
+
+    <form id="registerForm">
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input id="name" class="form-control" required title="Name must be at least 3 characters..">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input id="username" class="form-control" required title="Username must be at least 4 characters.">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input id="email" class="form-control" type="email" required title="A valid email address is required.">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">School Name</label>
+            <input id="schoolName" class="form-control" required title="School name is required.">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input id="password" class="form-control" type="password" required title="Password must be at least 6 characters.">
+        </div>
+
+        <button type="submit" onclick="register(event)" class="btn btn-success w-100">Register</button>
+
+        <p class="text-center mt-3">
+            <a href="login.html">Already have an account? Login</a>
+        </p>
+
+        <p id="error" class="text-danger mt-2 text-center"></p>
+    </form>
+</div>
+
+<script>
+    const AUTH_URL = "http://localhost:8080/api/auth/register";
+    const errorDisplay = document.getElementById("error");
+
+    // Simple regex for basic email format validation (more robust than just type="email")
+    const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+
+    /**
+     * Handles the user registration process.
+     */
+    async function register(event) {
+        event.preventDefault(); 
+        errorDisplay.textContent = "";
+
+        const formEl = document.getElementById("registerForm");
+        
+        // 1. HTML5 Validity Check
+        if (!formEl.reportValidity()) {
+            errorDisplay.textContent = "Please fill in all required fields correctly.";
+            return;
+        }
+
+        const name = document.getElementById("name").value.trim();
+        const username = document.getElementById("username").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const schoolName = document.getElementById("schoolName").value.trim();
+        const password = document.getElementById("password").value;
+
+        // 2. Custom Validation Checks:
+
+        // Name/School Name Check (Already mostly covered by 'required', but good for trim check)
+        if (!name) {
+             errorDisplay.textContent = "Name cannot be empty.";
+             return;
+        }
+        if (!schoolName) {
+             errorDisplay.textContent = "School Name cannot be empty.";
+             return;
+        }
+
+        // Username Check (Min 4 characters)
+        if (username.length < 4) {
+             errorDisplay.textContent = "Username must be at least 4 characters long.";
+             return;
+        }
+
+        // Email Format Check
+        if (!EMAIL_REGEX.test(email)) {
+             errorDisplay.textContent = "Please enter a valid email format.";
+             return;
+        }
+
+        // Password Check (Min 6 characters)
+        if (password.length < 6) {
+             errorDisplay.textContent = "Password must be at least 6 characters long.";
+             return;
+        }
+
+
+        // Payload keys match RegisterRequest DTO fields exactly
+        const registrationData = {
+            name: name,
+            username: username,
+            email: email,
+            schoolName: schoolName,
+            password: password
+        };
+
+        try {
+            const response = await fetch(AUTH_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registrationData)
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.text(); 
+                let errorMessage = `Registration failed: HTTP Error ${response.status}.`;
+                
+                try {
+                    const errorJson = JSON.parse(errorBody);
+                    if (errorJson.errors && errorJson.errors.length > 0) {
+                        errorMessage = `Validation Error: ${errorJson.errors[0].field} - ${errorJson.errors[0].defaultMessage}`;
+                    } else {
+                        errorMessage = errorJson.message || errorMessage;
+                    }
+                } catch {
+                    errorMessage = errorBody || errorMessage;
+                }
+                
+                throw new Error(errorMessage);
+            }
+
+            // Success
+            alert("Registration successful! You can now log in.");
+            window.location.href = "login.html";
+
+        } catch (error) {
+            console.error("Registration failed:", error);
+            errorDisplay.textContent = error.message;
+        }
+    }
+</script>
+</body>
+</html>

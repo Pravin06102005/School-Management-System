@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Divisions - School Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        /* ---------------- THEME & LAYOUT VARIABLES ---------------- */
+        :root {
+            --sidebar-width: 260px;
+            --primary-color: #0d6efd; 
+            --bg-color: #f4f7fa; 
+            --dark-color: #2c3e50;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            background: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            /* Desktop Default: Content shifted right */
+            padding-left: var(--sidebar-width); 
+            overflow-x: hidden;
+        }
+
+        /* SIDEBAR STYLING */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--dark-color);
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding-top: 20px;
+            color: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 1050; /* Above content, for mobile toggle */
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar .logo-title {
+            color: white;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            padding: 0 25px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: #bdc3c7;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1rem;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 21px; 
+        }
+        
+        .sidebar .logout-link {
+            color: var(--danger-color); 
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+        }
+        
+        .sidebar .logout-link:hover {
+            background: rgba(220, 53, 69, 0.2); 
+            color: white;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        /* MAIN CONTENT STYLING (Desktop Default) */
+        .content {
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        /* Form and Table Card Styles */
+        .card { border: none !important; }
+        .table-bordered th, .table-bordered td { border: 1px solid #dee2e6 !important; }
+
+        .top-bar {
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        /* ---------------- MOBILE RESPONSIVENESS ---------------- */
+
+        @media (max-width: 991px) {
+            body {
+                padding-left: 0; /* Remove desktop padding */
+            }
+            .sidebar {
+                /* Hide sidebar off-screen to the left */
+                transform: translateX(-260px); 
+            }
+            /* Show the toggle button on small screens */
+            #sidebarToggle {
+                display: block !important;
+            }
+            .content {
+                padding: 15px; /* Reduced padding for mobile space */
+            }
+            /* Ensure form fields stack vertically on mobile */
+            .row.g-3 > .col-md-5,
+            .row.g-3 > .col-md-4,
+            .row.g-3 > .col-md-3 {
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
+        
+        /* Class added by JS to show sidebar on mobile */
+        .sidebar-toggled .sidebar {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+
+<body id="page-body">
+
+    <div class="sidebar">
+        <div class="logo-title text-center">
+            <i class="bi bi-gear-fill me-2"></i> Admin Panel
+        </div>
+
+        <a href="index.html">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a href="standards.html">
+            <i class="bi bi-journal-check"></i> Standards
+        </a>
+        <a href="divisions.html" class="active">
+            <i class="bi bi-collection"></i> Divisions
+        </a>
+        <a href="students.html">
+            <i class="bi bi-person-bounding-box"></i> Students
+        </a>
+        <a href="staff.html">
+            <i class="bi bi-people"></i> Staff
+        </a>
+        <a href="profile.html"><i class="bi bi-person-circle"></i> Profile & Settings</a>
+        
+        <a href="#" onclick="logout()" class="logout-link">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+    </div>
+
+    <div class="content">
+        <div class="top-bar d-flex align-items-center">
+            <button class="btn btn-outline-dark d-lg-none me-3" id="sidebarToggle">
+                <i class="bi bi-list fs-5"></i>
+            </button>
+            <h2 class="mb-0 text-primary border-bottom pb-2">
+                <i class="bi bi-collection me-2"></i>Manage Divisions
+            </h2>
+        </div>
+        
+        <div class="card p-4 mb-4 shadow-sm">
+            <h4 class="card-title mb-3 text-secondary" id="formTitle">
+                <i class="bi bi-plus-circle-fill me-2"></i>Add New Division
+            </h4>
+
+            <input type="hidden" id="updateId">
+
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label for="divisionName" class="form-label">Division Name</label>
+                    <input id="divisionName" class="form-control" placeholder="Ex: A, B, Green">
+                </div>
+                <div class="col-md-4">
+                    <label for="standardDropdown" class="form-label">Select Standard</label>
+                    <select id="standardDropdown" class="form-select"></select>
+                </div>
+                <div class="col-md-3">
+                    <button id="saveBtn" onclick="saveDivision()" class="btn btn-success w-100 py-2">
+                        <i class="bi bi-save-fill me-1"></i>Add Division
+                    </button>
+                </div>
+            </div>
+            <p id="divError" class="text-danger mt-3 fw-bold"></p>
+        </div>
+
+        <div class="card p-4 shadow-sm">
+            <h4 class="card-title mb-4 text-primary">
+                <i class="bi bi-list-ol me-2"></i>Divisions List
+            </h4>
+
+            <div class="row mb-3 align-items-center">
+                <div class="col-md-4">
+                    <label for="standardFilter" class="form-label fw-bold">Filter by Standard:</label>
+                    <select id="standardFilter" class="form-select" onchange="filterDivisions()">
+                        <option value="">Show All Standards</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Division Name</th>
+                            <th>Standard</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="divisionTable">
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Loading divisions...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // --- Configuration & Initialization ---
+    // API Endpoints
+    const DIV_URL = "http://localhost:8080/api/divisions";
+    const STD_URL = "http://localhost:8080/api/standards";
+    
+    // Auth Check
+    const token = localStorage.getItem("token");
+    if (!token) {
+        // window.location.href = "login.html"; // Uncomment for security
+    }
+
+    const headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token,
+    };
+
+    // DOM Elements
+    const divisionNameInput = document.getElementById("divisionName");
+    const standardDropdown = document.getElementById("standardDropdown");
+    const standardFilter = document.getElementById("standardFilter"); 
+    const updateIdInput = document.getElementById("updateId");
+    const saveBtn = document.getElementById("saveBtn");
+    const formTitle = document.getElementById("formTitle");
+    const divisionTable = document.getElementById("divisionTable");
+    const divError = document.getElementById("divError");
+    const pageBody = document.getElementById("page-body"); // For responsive toggle
+    
+    let allStandards = []; // Global store for standard name lookup
+
+    // --- Responsive Toggle Logic ---
+    document.getElementById("sidebarToggle").addEventListener("click", function (e) {
+        e.preventDefault();
+        pageBody.classList.toggle("sidebar-toggled");
+    });
+    
+    document.querySelectorAll('.sidebar a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth < 992) {
+                pageBody.classList.remove('sidebar-toggled');
+            }
+        });
+    });
+    // -----------------------------------
+
+
+    // --- Utility Functions ---
+
+    function clearForm() {
+        divisionNameInput.value = "";
+        standardDropdown.value = "";
+        updateIdInput.value = "";
+        saveBtn.innerHTML = '<i class="bi bi-save-fill me-1"></i>Add Division';
+        saveBtn.classList.replace("btn-info", "btn-success");
+        formTitle.innerHTML = '<i class="bi bi-plus-circle-fill me-2"></i>Add New Division';
+        divError.textContent = "";
+    }
+
+    function logout() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("schoolName");
+        alert("Logged out."); 
+        window.location.href = "login.html";
+    }
+
+    /**
+     * Finds the standard name from its ID for table rendering.
+     */
+    function getStandardName(stdId) {
+        const standard = allStandards.find(s => s.id === stdId);
+        return standard ? standard.name : 'N/A';
+    }
+
+
+    // --- Standards Dropdown Logic ---
+
+    /**
+     * Loads standards from API and populates both the form dropdown and the filter dropdown.
+     */
+    async function loadStandardDataAndPopulateDropdowns() {
+        try {
+            const response = await fetch(STD_URL, { headers }); 
+            if (!response.ok) throw new Error(`Failed to load standards: ${response.statusText}`);
+            
+            const standards = await response.json();
+            allStandards = standards.sort((a, b) => a.level - b.level);
+            
+            // 1. Populate Add/Edit Form Dropdown
+            standardDropdown.innerHTML = '<option value="">-- Select Standard --</option>';
+            // 2. Populate Filter Dropdown
+            standardFilter.innerHTML = '<option value="">Show All Standards</option>';
+
+            allStandards.forEach(std => {
+                const optionHtml = `<option value="${std.id}">${std.name}</option>`;
+                
+                standardDropdown.innerHTML += optionHtml;
+                standardFilter.innerHTML += optionHtml;
+            });
+
+        } catch (error) {
+            console.error("Error loading standards dropdowns:", error);
+            divError.textContent = "Error loading Standards required for Divisions. Check API.";
+        }
+    }
+    
+    /**
+     * Re-loads the divisions table based on the selected filter.
+     */
+    function filterDivisions() {
+        const selectedStandardId = standardFilter.value;
+        loadDivisions(selectedStandardId);
+    }
+
+
+    // --- Division CRUD Operations ---
+
+    /**
+     * Renders the division data into the table body.
+     */
+    function renderTable(divisions) {
+        divisionTable.innerHTML = "";
+        if (divisions.length === 0) {
+            divisionTable.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No divisions found matching the criteria.</td></tr>';
+            return;
+        }
+
+        divisions.forEach((div, index) => {
+            const stdName = getStandardName(div.standardId);
+            const row = `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${div.name}</td>
+                    <td>${stdName}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info me-2 text-white" 
+                            onclick="editDivision('${div.id}', '${div.name}', '${div.standardId}')">
+                            <i class="bi bi-pencil-square"></i> Edit
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteDivision('${div.id}')">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            `;
+            divisionTable.innerHTML += row;
+        });
+    }
+
+    /**
+     * Loads all divisions from the API, optionally filtered by standardId (Path Variable).
+     * @param {string | null} standardId - Optional ID to filter divisions.
+     */
+    async function loadDivisions(standardId = null) {
+        divError.textContent = "";
+        divisionTable.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Loading divisions...</td></tr>';
+
+        let url = DIV_URL;
+        
+        // Use the appropriate API endpoint structure
+        if (standardId) {
+            // Assuming backend supports fetching divisions by standard via path variable
+            url = `${DIV_URL}/standard/${standardId}`;
+        }
+
+        try {
+            const response = await fetch(url, { headers }); 
+            if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+            
+            const divisions = await response.json();
+            renderTable(divisions);
+
+        } catch (error) {
+            console.error("Error loading divisions:", error);
+            divisionTable.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Failed to load data. Check API status and CORS settings.</td></tr>';
+        }
+    }
+
+    /**
+     * Saves (Create or Update) a division.
+     */
+    async function saveDivision() {
+        const name = divisionNameInput.value.trim();
+        const standardId = standardDropdown.value;
+        const id = updateIdInput.value;
+        divError.textContent = "";
+
+        if (!name) {
+            divError.textContent = "Division Name is required.";
+            return;
+        }
+        if (!standardId) {
+            divError.textContent = "Please select a Standard.";
+            return;
+        }
+
+        const method = id ? "PUT" : "POST";
+        const url = id ? `${DIV_URL}/${id}` : DIV_URL;
+        const payload = { name, standardId };
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: headers,
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: 'Unknown API error' }));
+                throw new Error(errorData.message || `Failed to ${method === 'POST' ? 'add' : 'update'} division.`);
+            }
+
+            alert(`Division ${method === 'POST' ? 'added' : 'updated'} successfully!`);
+            clearForm();
+            // Reload the table using the current filter setting
+            filterDivisions(); 
+
+        } catch (error) {
+            console.error("Save error:", error);
+            divError.textContent = `Error: ${error.message}`;
+        }
+    }
+
+    /**
+     * Prepares the form for editing.
+     */
+    function editDivision(id, name, standardId) {
+        divisionNameInput.value = name;
+        standardDropdown.value = standardId;
+        updateIdInput.value = id;
+
+        saveBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>Update Division';
+        saveBtn.classList.replace("btn-success", "btn-info");
+        formTitle.innerHTML = `<i class="bi bi-pencil-square me-2"></i>Editing Division: ${name}`;
+        window.scrollTo(0, 0); 
+    }
+
+    /**
+     * Deletes a division.
+     */
+    async function deleteDivision(id) {
+        if (!confirm("Are you sure you want to delete this division?")) return;
+        divError.textContent = "";
+
+        try {
+            const response = await fetch(`${DIV_URL}/${id}`, {
+                method: "DELETE",
+                headers: headers
+            });
+
+            if (!response.ok) {
+                 const errorData = await response.json().catch(() => ({ message: 'Unknown API error' }));
+                 throw new Error(errorData.message || 'Failed to delete division.');
+            }
+            
+            alert("Division deleted successfully!");
+            // Reload the table using the current filter setting
+            filterDivisions(); 
+
+        } catch (error) {
+            console.error("Delete error:", error);
+            divError.textContent = `Error: ${error.message}`;
+        }
+    }
+
+
+    // --- Page Load ---
+    document.addEventListener('DOMContentLoaded', async () => {
+        // 1. Load Standards (for both form and filter)
+        await loadStandardDataAndPopulateDropdowns();
+        
+        // 2. Load Divisions (using the default 'Show All' filter setting)
+        await loadDivisions();
+        
+        // Attach global functions to window for onclick and onchange handlers
+        window.saveDivision = saveDivision;
+        window.editDivision = editDivision;
+        window.deleteDivision = deleteDivision;
+        window.logout = logout;
+        window.filterDivisions = filterDivisions;
+    });
+
+</script>
+
+</body>
+</html>

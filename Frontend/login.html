@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        /* Responsive Styling */
+        .vh-100 {
+            /* Ensure vertical centering works even if body height is less than 100vh */
+            min-height: 100vh;
+        }
+        
+        .card {
+            border-radius: 15px;
+            /* Remove the fixed 'width: 350px' from inline style and define responsive width here */
+            max-width: 400px;
+            width: 90%; /* Take up 90% of the screen width on small devices */
+        }
+
+        /* Adjust padding for very small screens */
+        @media (max-width: 400px) {
+            .card {
+                padding: 15px !important;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-light d-flex justify-content-center align-items-center vh-100">
+
+<div class="card p-4 shadow">
+    <h3 class="text-center mb-3 text-primary">Admin Login</h3>
+
+    <div>
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input id="username" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input id="password" type="password" class="form-control">
+        </div>
+
+        <button onclick="login()" class="btn btn-primary w-100">Login</button>
+    </div>
+
+    <p class="text-center mt-3">
+        <a href="register.html">Create an Admin Account</a>
+    </p>
+
+    <p id="error" class="text-danger mt-2 text-center"></p>
+</div>
+
+<script src="assets/js/auth.js"></script>
+</body>
+</html>
