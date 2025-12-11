@@ -15,7 +15,9 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
 
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5500",
+                        .allowedOrigins(
+                            "https://school-management-s.netlify.app",
+                            "http://localhost:5500",
                                 "http://127.0.0.1:5500",
                                 "http://localhost:3000",
                                 "http://localhost") // add your frontend URL here
