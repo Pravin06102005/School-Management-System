@@ -13,7 +13,7 @@ function login() {
     let user = document.getElementById("username").value.trim();
     let pass = document.getElementById("password").value.trim();
 
-    fetch("http://localhost:8080/api/auth/login", {
+    fetch("https://school-management-system-vhn2.onrender.com/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: user, password: pass })
@@ -62,7 +62,7 @@ async function register() {
     };
 
     try {
-        const res = await fetch("http://localhost:8080/api/auth/register", {
+        const res = await fetch("https://school-management-system-vhn2.onrender.com/api/auth/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
