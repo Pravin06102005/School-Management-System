@@ -1,24 +1,29 @@
-# ============================
-# 1️⃣ BUILD STAGE
-# ============================
+# ---------- STAGE 1: BUILD ----------
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copy project files from School-Management folder
-COPY School-Management/pom.xml .
-COPY School-Management/src ./src
+# Copy only dependency files first
+COPY pom.xml .
+COPY .mvn .mvn
+COPY mvnw .
+COPY mvnw.cmd .
 
-# Build jar
-RUN mvn -q -e -DskipTests package
+# Download dependencies
+RUN chmod +x mvnw
+RUN ./mvnw dependency:go-offline
 
-# ============================
-# 2️⃣ RUN STAGE
-# ============================
+# Copy source code
+COPY src ./src
+
+# Build the application
+RUN ./mvnw clean package -DskipTests
+
+# ---------- STAGE 2: RUN ----------
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
 
-# Copy built jar from previous stage
 COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
