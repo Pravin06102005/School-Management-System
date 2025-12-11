@@ -27,6 +27,24 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
+
+
+            // 🔹 CORS + disable CSRF
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowCredentials(true);
+                    config.setAllowedOrigins(List.of(
+                           "https://school-management-s.netlify.app/",
+                            "http://127.0.0.1:5500",
+                            "http://localhost:5500",
+                            "http://localhost:3000"
+                    ));
+                    config.setAllowedHeaders(List.of("Origin", "Content-Type", "Accept", "Authorization"));
+                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    return config;
+                }))
+            
                 .csrf(cs -> cs.disable())
                 .cors(cors -> {}) // ⭐ ENABLE CORS SUPPORT
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // ⭐ NO JSESSIONID
