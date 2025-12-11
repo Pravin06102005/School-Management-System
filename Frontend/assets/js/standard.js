@@ -1,4 +1,4 @@
-const API = "http://localhost:8080/api/standards";
+const API = "https://school-management-system-vhn2.onrender.com/api/standards";
 const token = localStorage.getItem("token");
 
 // Redirect if not logged in
@@ -140,7 +140,7 @@ function logout() {
 }
 
 // Test student fetch (ignored)
-fetch("http://localhost:8080/api/students", {
+fetch("https://school-management-system-vhn2.onrender.com/api/students", {
     method: "GET",
     headers: {
         "Authorization": "Bearer " + localStorage.getItem("token"),
