@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,57 +20,40 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-        //         .csrf(cs -> cs.disable())
-        //         .cors(cors -> {}) // ⭐ ENABLE CORS SUPPORT
-        //         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // ⭐ NO JSESSIONID
-        //         .authorizeHttpRequests(auth -> auth
-        //                 .requestMatchers("/api/auth/**").permitAll()
-        //                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-        //                 .requestMatchers("/api/divisions").hasRole("ADMIN")
-        //                 .requestMatchers("/api/students").hasRole("ADMIN")
-        //                 .anyRequest().authenticated()
-        //         )
+                .csrf(cs -> cs.disable())
+                .cors(cors -> {}) // CORS is now handled by WebConfig.java
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                
+                .authorizeHttpRequests(auth -> auth
+                        // 1. Authentication Endpoints (Registration/Login) - Accessible to all
+                        .requestMatchers("/api/auth/**").permitAll()
+                        
+                        // 2. Dashboard Data Endpoints - Require ADMIN role (Fixes 400 Errors)
+                        // These are the specific endpoints hit by your dashboard's loadCounts/loadStandardDistribution
+                        .requestMatchers(
+                            "/api/standards", 
+                            "/api/divisions",
+                            "/api/students",
+                            "/api/staff"
+                        ).hasRole("ADMIN")
+                        
+                        // 3. Log/Activity Endpoint - Require ADMIN role (Fixes 403 Forbidden)
+                        .requestMatchers("/api/logs/**").hasRole("ADMIN")
+                        
+                        // 4. Admin Management Endpoints - Require ADMIN role (Profile/Settings)
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-        //         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // ⭐ Correct placement
+                        // 5. All Other Requests MUST be authenticated (require a valid JWT token)
+                        .anyRequest().authenticated()
+                )
 
-        // return http.build();
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-
-            .csrf(cs -> cs.disable())
-                .cors(cors -> {}) 
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) 
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        
-                        // ⭐ UPDATED RULES BELOW THIS LINE ⭐
-                        
-                        // Grant ADMIN access to dashboard data endpoints (400 Bad Request Fix)
-                        .requestMatchers(
-                            "/api/standards", 
-                            "/api/divisions",
-                            "/api/students",
-                            "/api/staff"
-                        ).hasRole("ADMIN")
-
-                        // Grant ADMIN access to logs (403 Forbidden Fix)
-                        .requestMatchers("/api/logs/**").hasRole("ADMIN") // Fix for 403 error
-
-                        // Grant ADMIN access to admin profile/management (already mostly correct)
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-                        // All other requests MUST be authenticated (which means they need a valid token)
-                        .anyRequest().authenticated()
-                )
-
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); 
-
-        return http.build();
-    
+        return http.build();
     }
 
     @Bean
@@ -85,7 +66,4 @@ public class SecurityConfig {
             throws Exception {
         return configuration.getAuthenticationManager();
     }
-
-
-
 }
