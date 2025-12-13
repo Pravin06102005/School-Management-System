@@ -60,6 +60,18 @@
             #sidebarToggle { display: block !important; }
             .content { padding: 15px; }
         }
+        /* Custom styles for the logout link */
+        .sidebar .logout-link {
+            color: var(--danger-color);
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+        }
+        .sidebar .logout-link:hover {
+            background: rgba(220, 53, 69, 0.2);
+            color: white;
+            border-left: 4px solid var(--danger-color);
+        }
     </style>
 </head>
 
@@ -166,9 +178,9 @@
         const ayTable = document.getElementById("ayTable");
         const ayError = document.getElementById("ayError");
         const activeYearStatus = document.getElementById("activeYearStatus");
-        
+
         // --- Utility Functions ---
-        
+
         function clearForm() {
             yearNameInput.value = "";
             startDateInput.value = "";
@@ -197,37 +209,46 @@
                 return;
             }
 
-            // Sort by start date, newest first
-            years.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+            // The 'startDate' field is not present in the backend DTO/Entity based on your last provided code.
+            // If the backend returns it, this sort works. If not, it falls back to default sorting.
+            years.sort((a, b) => {
+                // Use a safe check for startDate which is assumed to be missing based on DTO
+                const dateA = a.startDate ? new Date(a.startDate) : new Date(0);
+                const dateB = b.startDate ? new Date(b.startDate) : new Date(0);
+                return dateB - dateA;
+            });
 
             years.forEach(year => {
                 const is_active = year.active;
                 const active_class = is_active ? 'bg-success' : 'bg-secondary';
                 const active_icon = is_active ? 'bi-check-circle-fill' : 'bi-x-circle';
                 
+                // ⭐ CRITICAL CHANGE: Use 'code' for display if 'name' is missing, as backend DTO uses 'code' ⭐
+                const displayName = year.code || yearNameInput.placeholder; 
+                
                 // Show the active year in the title status
                 if (is_active) {
-                    activeYearStatus.textContent = `Active: ${year.name}`;
+                    activeYearStatus.textContent = `Active: ${displayName}`;
                 }
 
                 const row = `
                     <tr class="${is_active ? 'table-success fw-bold' : ''}">
-                        <td>${year.name}</td>
-                        <td>${year.startDate}</td>
+                        <td>${displayName}</td>
+                        <td>${year.startDate || 'N/A'}</td> 
                         <td>
                             <span class="badge ${active_class}"><i class="bi ${active_icon} me-1"></i>${is_active ? 'ACTIVE' : 'Inactive'}</span>
                         </td>
                         <td>
                             ${!is_active ? 
-                                `<button class="btn btn-sm btn-outline-success me-2" onclick="setActive('${year.id}', '${year.name}')" title="Set as Active Year">
+                                `<button class="btn btn-sm btn-outline-success me-2" onclick="setActive('${year.id}', '${displayName}')" title="Set as Active Year">
                                     <i class="bi bi-toggle-on"></i> Set Active
                                 </button>` 
                                 : ''}
                             
-                            <button class="btn btn-sm btn-info me-2 text-white" onclick="editAcademicYear('${year.id}', '${year.name}', '${year.startDate}')">
+                            <button class="btn btn-sm btn-info me-2 text-white" onclick="editAcademicYear('${year.id}', '${displayName}', '${year.startDate || ''}')">
                                 <i class="bi bi-pencil-square"></i> Edit
                             </button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteAcademicYear('${year.id}', '${year.name}')" ${is_active ? 'disabled' : ''} title="${is_active ? 'Cannot delete active year' : 'Delete'}">
+                            <button class="btn btn-sm btn-danger" onclick="deleteAcademicYear('${year.id}', '${displayName}')" ${is_active ? 'disabled' : ''} title="${is_active ? 'Cannot delete active year' : 'Delete'}">
                                 <i class="bi bi-trash"></i> Delete
                             </button>
                         </td>
@@ -268,19 +289,33 @@
             const id = updateIdInput.value;
             ayError.textContent = "";
 
-            if (!name || !startDate) {
-                ayError.textContent = "Please enter both the Year Name and Start Date.";
+            if (!name) {
+                ayError.textContent = "Please enter the Year Name (Code).";
                 return;
+            }
+            // NOTE: startDate is currently ignored by the backend DTO, 
+            // but we keep the form validation to be safe if you update the DTO later.
+            if (!startDate) {
+                 ayError.textContent = "Please enter the Start Date.";
+                 return;
             }
 
             const method = id ? "PUT" : "POST";
             const url = id ? `${API_BASE_URL}/${id}` : API_BASE_URL;
 
+            // ⭐ CRITICAL FIX: Match frontend input 'name' to DTO field 'code' ⭐
+            const payload = {
+                id: id || undefined, 
+                code: name,         // DTO field: 'code'
+                active: false       // Default to false on creation/update via form
+                // startDate is NOT sent because it's missing from the DTO
+            };
+            
             try {
                 const response = await fetch(url, {
                     method: method,
                     headers: headers,
-                    body: JSON.stringify({ id: id || undefined, name, startDate })
+                    body: JSON.stringify(payload)
                 });
 
                 if (!response.ok) {
@@ -302,9 +337,13 @@
          * Prepares the form for editing.
          */
         function editAcademicYear(id, name, startDate) {
+            // ⭐ FIX: Use 'name' for yearNameInput since the table renders 'code' as 'name' ⭐
             yearNameInput.value = name;
-            // The backend returns a full date string, input type="date" handles it.
-            startDateInput.value = startDate.split('T')[0]; 
+            
+            // ⭐ FIX: Robustly handle potential undefined/null date string to prevent warning ⭐
+            const datePart = startDate && startDate !== 'undefined' && startDate !== 'N/A' ? startDate.split('T')[0] : '';
+            startDateInput.value = datePart; 
+            
             updateIdInput.value = id;
 
             saveBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>Update Year';
@@ -322,14 +361,16 @@
             }
             ayError.textContent = "";
             try {
+                // This PATCH request relies on the backend having the PATCH method allowed in CORS.
                 const response = await fetch(`${API_BASE_URL}/${id}/active`, {
                     method: "PATCH",
                     headers: headers
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ message: 'Unknown error format' }));
-                    throw new Error(errorData.message || 'Failed to set active year.');
+                    // Try to extract a specific error message from the response body
+                    const errorBody = await response.text(); 
+                    throw new Error(errorBody || 'Failed to set active year.');
                 }
                 
                 alert(`"${name}" is now the active academic year.`);
@@ -359,7 +400,6 @@
 
                 if (!response.ok) {
                     const errorBody = await response.text();
-                    // Handle case where backend might return a plain text error on failed delete (e.g., if it's the active year)
                     throw new Error(errorBody || 'Failed to delete year.');
                 }
                 
