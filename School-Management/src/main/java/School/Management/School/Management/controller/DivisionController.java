@@ -12,7 +12,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/divisions")
-@CrossOrigin(origins = "*")
+// @CrossOrigin(origins = "*")
 public class DivisionController {
 
     private final DivisionService divisionService;
