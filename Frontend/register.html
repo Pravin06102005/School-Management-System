@@ -72,32 +72,68 @@
     </form>
 </div>
 
-
 <script>
-    // ⭐ SET THE LIVE RENDER URL HERE ⭐
-    const AUTH_URL = "https://school-management-system-vhn2.onrender.com/api/auth/register"; 
+    // ⭐ 1. UPDATED LIVE BACKEND URL ⭐
+    // Your Render service URL for the deployed Spring Boot application.
+    const BACKEND_BASE_URL = "https://school-management-system-vhn2.onrender.com";
+    const AUTH_URL = BACKEND_BASE_URL + "/api/auth/register";
+    
     const errorDisplay = document.getElementById("error");
 
     // Simple regex for basic email format validation (more robust than just type="email")
     const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
 
-    // ... (Your register function and validation checks remain the same)
-
+    /**
+     * Handles the user registration process.
+     */
     async function register(event) {
         event.preventDefault(); 
         errorDisplay.textContent = "";
 
         const formEl = document.getElementById("registerForm");
         
-        // ... (Your frontend validation checks remain the same)
-        
+        // 1. HTML5 Validity Check
+        if (!formEl.reportValidity()) {
+            errorDisplay.textContent = "Please fill in all required fields correctly.";
+            return;
+        }
+
+        const name = document.getElementById("name").value.trim();
+        const username = document.getElementById("username").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const schoolName = document.getElementById("schoolName").value.trim();
+        const password = document.getElementById("password").value;
+
+        // 2. Custom Validation Checks: (Keep these as they are good practice)
+        if (!name) {
+             errorDisplay.textContent = "Name cannot be empty.";
+             return;
+        }
+        if (!schoolName) {
+             errorDisplay.textContent = "School Name cannot be empty.";
+             return;
+        }
+        if (username.length < 4) {
+             errorDisplay.textContent = "Username must be at least 4 characters long.";
+             return;
+        }
+        if (!EMAIL_REGEX.test(email)) {
+             errorDisplay.textContent = "Please enter a valid email format.";
+             return;
+        }
+        if (password.length < 6) {
+             errorDisplay.textContent = "Password must be at least 6 characters long.";
+             return;
+        }
+
+
         // Payload keys match RegisterRequest DTO fields exactly
         const registrationData = {
-            name: document.getElementById("name").value.trim(),
-            username: document.getElementById("username").value.trim(),
-            email: document.getElementById("email").value.trim(),
-            schoolName: document.getElementById("schoolName").value.trim(), // Check ID in HTML matches here
-            password: document.getElementById("password").value
+            name: name,
+            username: username,
+            email: email,
+            schoolName: schoolName,
+            password: password
         };
 
         try {
@@ -109,26 +145,28 @@
                 body: JSON.stringify(registrationData)
             });
 
-            // ⭐ CHECK FOR 4XX STATUS CODES (400, 409) ⭐
             if (!response.ok) {
-                const errorBody = await response.text(); 
+                // If the status is 4xx (400, 409), the server error message is in the body text.
+                const errorBodyText = await response.text(); 
                 let errorMessage = `Registration failed: HTTP Error ${response.status}.`;
                 
-                // Try to use the error message sent back by the server
-                errorMessage = errorBody || errorMessage;
+                // ⭐ IMPROVED ERROR HANDLING ⭐
+                // The GlobalExceptionHandler returns a plain String body (e.g., "Username already taken").
+                // Display the server's message directly.
+                errorMessage = errorBodyText || errorMessage;
                 
-                // ⭐ Display the specific message from the server (e.g., "Username already taken")
-                errorDisplay.textContent = errorMessage; 
-                return;
+                // Throw the error with the message provided by the server
+                throw new Error(errorMessage); 
             }
 
-            // Success
+            // Success (HTTP 200/201)
             alert("Registration successful! You can now log in.");
             window.location.href = "login.html";
 
         } catch (error) {
             console.error("Registration failed:", error);
-            errorDisplay.textContent = "Network error or Server offline.";
+            // Display the specific error message (e.g., "Username already taken")
+            errorDisplay.textContent = error.message; 
         }
     }
 </script>
