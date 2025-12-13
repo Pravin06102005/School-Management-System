@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Academic Years - School Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        /* General Layout & Sidebar Styles (Keeping consistent with your other pages) */
+        :root {
+            --sidebar-width: 260px;
+            --primary-color: #0d6efd;
+            --bg-color: #f4f7fa;
+            --dark-color: #2c3e50;
+            --danger-color: #dc3545;
+        }
+        body {
+            background: var(--bg-color);
+            padding-left: var(--sidebar-width);
+            overflow-x: hidden;
+        }
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--dark-color);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1050;
+            transition: transform 0.3s ease-in-out;
+            padding-top: 20px;
+        }
+        .sidebar a {
+            text-decoration: none;
+            color: #bdc3c7;
+            padding: 15px 25px;
+            display: flex;
+            gap: 15px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 21px;
+        }
+        .sidebar-toggled .sidebar {
+            transform: translateX(0);
+        }
+        .content {
+            padding: 30px;
+            min-height: 100vh;
+        }
+        .top-bar { margin-bottom: 20px; }
+        .card { border: none !important; }
+        @media (max-width: 991px) {
+            body { padding-left: 0; }
+            .sidebar { transform: translateX(-260px); }
+            #sidebarToggle { display: block !important; }
+            .content { padding: 15px; }
+        }
+    </style>
+</head>
+
+<body id="page-body">
+
+    <div class="sidebar">
+        <div class="logo-title text-center text-white fw-bold fs-5 mb-4">
+            <i class="bi bi-gear-fill me-2"></i> Admin Panel
+        </div>
+        <a href="index.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="academic_years.html" class="active"><i class="bi bi-calendar-check"></i> Academic Years</a>
+        <a href="standards.html"><i class="bi bi-journal-check"></i> Standards</a>
+        <a href="divisions.html"><i class="bi bi-collection"></i> Divisions</a>
+        <a href="students.html"><i class="bi bi-person-bounding-box"></i> Students</a>
+        <a href="staff.html"><i class="bi bi-people"></i> Staff</a>
+        <a href="profile.html"><i class="bi bi-person-circle"></i> Profile & Settings</a>
+        <a href="#" onclick="logout()" class="logout-link text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </div>
+
+    <div class="content">
+        <div class="top-bar d-flex align-items-center">
+            <button class="btn btn-outline-dark d-lg-none me-3" id="sidebarToggle">
+                <i class="bi bi-list fs-5"></i>
+            </button>
+            <h2 class="mb-0 text-primary border-bottom pb-2">
+                <i class="bi bi-calendar-check-fill me-2"></i>Manage Academic Years
+            </h2>
+        </div>
+        
+        <div class="container-fluid p-0">
+
+            <div class="card p-4 mb-4 shadow-sm">
+                <h4 class="card-title mb-3 text-secondary" id="formTitle">
+                    <i class="bi bi-plus-circle-fill me-2"></i>Add New Academic Year
+                </h4>
+
+                <input type="hidden" id="updateId">
+
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label for="yearName" class="form-label">Year Name</label>
+                        <input id="yearName" class="form-control" placeholder="Ex: 2024-2025">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input id="startDate" type="date" class="form-control">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button id="saveBtn" onclick="saveAcademicYear()" class="btn btn-success w-100 py-2">
+                            <i class="bi bi-save-fill me-1"></i>Add Year
+                        </button>
+                    </div>
+                </div>
+                <p id="ayError" class="text-danger mt-3 fw-bold"></p>
+            </div>
+
+            <div class="card p-4 shadow-sm">
+                <h4 class="card-title mb-4 text-primary">
+                    <i class="bi bi-list-ol me-2"></i>Academic Years List
+                    <span id="activeYearStatus" class="badge bg-success float-end"></span>
+                </h4>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Start Date</th>
+                                <th>Active</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ayTable">
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">Loading academic years...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // --- Configuration & Initialization ---
+        const API_BASE_URL = "https://school-management-system-vhn2.onrender.com/api/academic-years";
+        const token = localStorage.getItem("token") || "";
+        
+        if (!token) {
+             window.location.href = "login.html"; // Redirect unauthenticated users
+        }
+
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token,
+        };
+
+        const yearNameInput = document.getElementById("yearName");
+        const startDateInput = document.getElementById("startDate");
+        const updateIdInput = document.getElementById("updateId");
+        const saveBtn = document.getElementById("saveBtn");
+        const formTitle = document.getElementById("formTitle");
+        const ayTable = document.getElementById("ayTable");
+        const ayError = document.getElementById("ayError");
+        const activeYearStatus = document.getElementById("activeYearStatus");
+        
+        // --- Utility Functions ---
+        
+        function clearForm() {
+            yearNameInput.value = "";
+            startDateInput.value = "";
+            updateIdInput.value = "";
+            saveBtn.innerHTML = '<i class="bi bi-save-fill me-1"></i>Add Year';
+            saveBtn.classList.replace("btn-info", "btn-success");
+            formTitle.innerHTML = '<i class="bi bi-plus-circle-fill me-2"></i>Add New Academic Year';
+            ayError.textContent = "";
+        }
+
+        function logout() {
+            localStorage.removeItem("token");
+            localStorage.removeItem("schoolName");
+            window.location.href = "login.html";
+        }
+        
+        // --- CRUD Operations ---
+        
+        /**
+         * Renders the data into the table body.
+         */
+        function renderTable(years) {
+            ayTable.innerHTML = "";
+            if (years.length === 0) {
+                ayTable.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No academic years found.</td></tr>';
+                return;
+            }
+
+            // Sort by start date, newest first
+            years.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+
+            years.forEach(year => {
+                const is_active = year.active;
+                const active_class = is_active ? 'bg-success' : 'bg-secondary';
+                const active_icon = is_active ? 'bi-check-circle-fill' : 'bi-x-circle';
+                
+                // Show the active year in the title status
+                if (is_active) {
+                    activeYearStatus.textContent = `Active: ${year.name}`;
+                }
+
+                const row = `
+                    <tr class="${is_active ? 'table-success fw-bold' : ''}">
+                        <td>${year.name}</td>
+                        <td>${year.startDate}</td>
+                        <td>
+                            <span class="badge ${active_class}"><i class="bi ${active_icon} me-1"></i>${is_active ? 'ACTIVE' : 'Inactive'}</span>
+                        </td>
+                        <td>
+                            ${!is_active ? 
+                                `<button class="btn btn-sm btn-outline-success me-2" onclick="setActive('${year.id}', '${year.name}')" title="Set as Active Year">
+                                    <i class="bi bi-toggle-on"></i> Set Active
+                                </button>` 
+                                : ''}
+                            
+                            <button class="btn btn-sm btn-info me-2 text-white" onclick="editAcademicYear('${year.id}', '${year.name}', '${year.startDate}')">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteAcademicYear('${year.id}', '${year.name}')" ${is_active ? 'disabled' : ''} title="${is_active ? 'Cannot delete active year' : 'Delete'}">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                ayTable.innerHTML += row;
+            });
+        }
+
+        /**
+         * Loads all academic years from the API.
+         */
+        async function loadAcademicYears() {
+            ayError.textContent = "";
+            activeYearStatus.textContent = "Loading...";
+            try {
+                const response = await fetch(API_BASE_URL, { headers });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.statusText}`);
+                }
+                const data = await response.json();
+                renderTable(data);
+
+            } catch (error) {
+                console.error("Error loading academic years:", error);
+                ayTable.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Failed to load data. Please check the API status.</td></tr>';
+                activeYearStatus.textContent = "Error";
+            }
+        }
+
+        /**
+         * Saves (Create or Update) an academic year.
+         */
+        async function saveAcademicYear() {
+            const name = yearNameInput.value.trim();
+            const startDate = startDateInput.value;
+            const id = updateIdInput.value;
+            ayError.textContent = "";
+
+            if (!name || !startDate) {
+                ayError.textContent = "Please enter both the Year Name and Start Date.";
+                return;
+            }
+
+            const method = id ? "PUT" : "POST";
+            const url = id ? `${API_BASE_URL}/${id}` : API_BASE_URL;
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: headers,
+                    body: JSON.stringify({ id: id || undefined, name, startDate })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: 'Unknown error format' }));
+                    throw new Error(errorData.message || `Failed to ${method === 'POST' ? 'add' : 'update'} year.`);
+                }
+
+                alert(`Academic Year ${method === 'POST' ? 'added' : 'updated'} successfully!`);
+                clearForm();
+                await loadAcademicYears();
+
+            } catch (error) {
+                console.error("Save error:", error);
+                ayError.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        /**
+         * Prepares the form for editing.
+         */
+        function editAcademicYear(id, name, startDate) {
+            yearNameInput.value = name;
+            // The backend returns a full date string, input type="date" handles it.
+            startDateInput.value = startDate.split('T')[0]; 
+            updateIdInput.value = id;
+
+            saveBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>Update Year';
+            saveBtn.classList.replace("btn-success", "btn-info");
+            formTitle.innerHTML = `<i class="bi bi-pencil-square me-2"></i>Editing Year: ${name}`;
+            window.scrollTo(0, 0); 
+        }
+
+        /**
+         * Sets an academic year as active (PATCH).
+         */
+        async function setActive(id, name) {
+            if (!confirm(`Are you sure you want to set "${name}" as the ACTIVE academic year?`)) {
+                return;
+            }
+            ayError.textContent = "";
+            try {
+                const response = await fetch(`${API_BASE_URL}/${id}/active`, {
+                    method: "PATCH",
+                    headers: headers
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: 'Unknown error format' }));
+                    throw new Error(errorData.message || 'Failed to set active year.');
+                }
+                
+                alert(`"${name}" is now the active academic year.`);
+                await loadAcademicYears();
+
+            } catch (error) {
+                console.error("Set Active error:", error);
+                ayError.textContent = `Error: ${error.message}`;
+            }
+        }
+
+
+        /**
+         * Deletes an academic year.
+         */
+        async function deleteAcademicYear(id, name) {
+            if (!confirm(`Are you sure you want to delete the academic year "${name}"? This cannot be undone.`)) {
+                return;
+            }
+            ayError.textContent = "";
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/${id}`, {
+                    method: "DELETE",
+                    headers: headers
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    // Handle case where backend might return a plain text error on failed delete (e.g., if it's the active year)
+                    throw new Error(errorBody || 'Failed to delete year.');
+                }
+                
+                alert("Academic Year deleted successfully!");
+                await loadAcademicYears();
+
+            } catch (error) {
+                console.error("Delete error:", error);
+                ayError.textContent = `Error: ${error.message}`;
+            }
+        }
+
+
+        // --- Page Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAcademicYears();
+            // Expose global functions for onclick handlers defined in HTML
+            window.saveAcademicYear = saveAcademicYear;
+            window.editAcademicYear = editAcademicYear;
+            window.deleteAcademicYear = deleteAcademicYear;
+            window.setActive = setActive;
+            window.logout = logout;
+
+            // Sidebar toggle setup
+            const sidebarToggle = document.getElementById("sidebarToggle");
+            const pageBody = document.getElementById("page-body");
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener("click", function () {
+                    pageBody.classList.toggle("sidebar-toggled");
+                });
+            }
+        });
+
+    </script>
+</body>
+</html>
