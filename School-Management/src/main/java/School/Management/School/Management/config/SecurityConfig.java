@@ -38,7 +38,8 @@ public class SecurityConfig {
                             "/api/standards", 
                             "/api/divisions",
                             "/api/students",
-                            "/api/staff"
+                            "/api/staff",
+                            "/api/academic-years"
                         ).hasRole("ADMIN")
                         
                         // 3. Log/Activity Endpoint - Require ADMIN role (Fixes 403 Forbidden)
