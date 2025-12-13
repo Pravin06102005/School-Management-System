@@ -20,30 +20,36 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 public class AuthController {
 
+    private final AdminService adminService;//new
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AdminRepository adminRepository;
-    private final SchoolRepository schoolRepository;
+    // private final SchoolRepository schoolRepository;
 
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req){
 
-        Admin admin=new Admin();
-        admin.setUsername(req.getUsername());
-        admin.setPassword(passwordEncoder.encode(req.getPassword()));
-        admin.setName(req.getName());
-        admin.setEmail(req.getEmail());
+//         Admin admin=new Admin();
+//         admin.setUsername(req.getUsername());
+//         admin.setPassword(passwordEncoder.encode(req.getPassword()));
+//         admin.setName(req.getName());
+//         admin.setEmail(req.getEmail());
 
-        // each admin creates one school
-        School school=new School();
-//        school.setName(school.getName());
-        school.setName(req.getSchoolName());
-        school=schoolRepository.save(school);
+//         // each admin creates one school
+//         School school=new School();
+// //        school.setName(school.getName());
+//         school.setName(req.getSchoolName());
+//         school=schoolRepository.save(school);
 
-        admin.setSchool(school);
-        admin=adminRepository.save(admin);
+//         admin.setSchool(school);
+//         admin=adminRepository.save(admin);
 
+//         return ResponseEntity.ok("Admin registered successfully");
+
+        // ⭐ CLEAN DELEGATION TO SERVICE ⭐
+        adminService.register(req);
+        
         return ResponseEntity.ok("Admin registered successfully");
     }
 
