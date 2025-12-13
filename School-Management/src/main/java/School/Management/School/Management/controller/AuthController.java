@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import School.Management.School.Management.service.AdminService; 
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
