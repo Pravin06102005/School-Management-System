@@ -9,19 +9,17 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // ⭐ 1. Define the allowed origins explicitly. ⭐
-        // Replace 'YOUR-NETLIFY-DOMAIN.netlify.app' with your actual frontend URL.
         String[] allowedOrigins = {
-            "https://school-management-system-vhn2.onrender.com", // Your Render URL itself (for safety/same-origin)
-            "https://school-management-s.netlify.app",         // ⭐ PRIMARY FRONTEND URL ⭐
-            "http://localhost:8080",                            // Local Spring Boot testing
-            "http://localhost:3000"                             // Common local frontend port (if you use React/Vue)
+            "https://school-management-system-vhn2.onrender.com",
+            "https://school-management-s.netlify.app", // Your Netlify domain
+            "http://localhost:8080",
+            "http://localhost:3000"
         };
         
-        registry.addMapping("/api/**") // Apply CORS rules to all /api endpoints
+        registry.addMapping("/api/**") 
                 .allowedOrigins(allowedOrigins)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH") 
                 .allowedHeaders("*")
-                .allowCredentials(true); // Required since you are dealing with JWTs/credentials
+                .allowCredentials(true);
     }
 }
